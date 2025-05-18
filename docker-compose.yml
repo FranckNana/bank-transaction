@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  database:
+    image: postgres:14-alpine
+    container_name: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_USER: bankuser
+      POSTGRES_DB: mybankDB
+    restart: unless-stopped
+  back-end:
+    container_name: back-end
+    restart: always
+    build: ./bank-transaction
+    ports:
+      - 3000:3000
+    depends_on:
+      - database
+  web-app:
+    container_name: web-app
+    restart: always
+    build: ./web
+    ports:
+      - 8000:8000
+    depends_on:
+      - back-end    
+volumes:
+  postgres_data:
